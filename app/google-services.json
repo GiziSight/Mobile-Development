@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1075489775291",
+    "project_id": "gizi-sight",
+    "storage_bucket": "gizi-sight.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075489775291:android:c4e0313e86c9029969139e",
+        "android_client_info": {
+          "package_name": "com.example.gizisight"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1075489775291-vgkt4qo8ltgq4abd4njioj8ujnbp03ig.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gizisight",
+            "certificate_hash": "9f6b9da816763540e5a21b569a87c7050b9fc7dd"
+          }
+        },
+        {
+          "client_id": "1075489775291-9dgf69t2a891vhmtgaqlvosfth591j3b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAn2UkWaeqrM2RB2SJxPaEXCJ33jVSJfxU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1075489775291-9dgf69t2a891vhmtgaqlvosfth591j3b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

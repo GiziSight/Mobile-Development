@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Silahkan memotret satu jenis makanan"
+        android:fontFamily="@font/poppins_semibold"
+        android:textSize="26sp"
+        android:gravity="center"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Aplikasi hanya dapat mendeteksi satu jenis makanan"
+        android:fontFamily="@font/poppins"
+        android:textSize="12sp"
+        android:gravity="center"/>
+
+    <Button
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:id="@+id/btnAmbilGambar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ambil gambar"/>
+
+    <Button
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:id="@+id/btnKembali"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kembali"/>
+
+
+</LinearLayout>

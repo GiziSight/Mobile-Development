@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">Gizi Sight</string>
+    <string name="hitung_gizi_dalam_tubuh_dengan_mudah">Hitung gizi dalam tubuh dengan mudah</string>
+    <string name="mulai">Mulai</string>
+    <string name="masuk">Masuk</string>
+    <string name="masukkan_username">Masukkan username</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="err_email">Masukkan Email yang benar</string>
+    <array name="simple_items">
+        <item>Laki-laki</item>
+        <item>Perempuan</item>
+        <!-- Add more items as needed -->
+    </array>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <string-array name="data_name">
+        <item>Ahmad Dahlan</item>
+        <item>Ahmad Yani</item>
+        <item>Sutomo</item>
+    </string-array>
+
+    <string-array name="data_description">
+        <item>Salah seorang ulama dan khatib terkemuka di Masjid Besar Kasultanan Yogyakarta pada masa itu, dan ibu dari K.H</item>
+        <item>Salah seorang ulama dan khatib terkemuka di Masjid Besar Kasultanan Yogyakarta pada masa itu, dan ibu dari K.H</item>
+        <item>Salah seorang ulama dan khatib terkemuka di Masjid Besar Kasultanan Yogyakarta pada masa itu, dan ibu dari K.H</item>
+    </string-array>
+
+    <string-array name="data_photo">
+        <item>https://upload.wikimedia.org/wikipedia/commons/8/87/Ahmad_Dahlan.jpg</item>
+        <item>https://upload.wikimedia.org/wikipedia/commons/8/87/Ahmad_Dahlan.jpg</item>
+        <item>https://upload.wikimedia.org/wikipedia/commons/8/87/Ahmad_Dahlan.jpg</item>
+    </string-array>
+
+</resources>
