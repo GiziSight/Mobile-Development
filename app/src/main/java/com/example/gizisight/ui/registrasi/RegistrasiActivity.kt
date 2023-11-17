@@ -3,6 +3,8 @@ package com.example.gizisight.ui.registrasi
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
@@ -33,10 +35,29 @@ class RegistrasiActivity : AppCompatActivity() {
         }
 
         binding?.apply {
+            txtInputEmail.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    // Do Nothing
+                }
+
+                override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    // Validate the email format and show error if needed
+                    if (!isValidEmail(s.toString())) {
+                        tfEmail.error = "Invalid email format"
+                    } else {
+                        tfEmail.error = null // Clear the error
+                    }
+                }
+
+                override fun afterTextChanged(p0: Editable?) {
+                    // Do nothing
+                }
+            })
+
             btnDaftar.setOnClickListener{
                 loadingDialog.startLoadingDialog()
                 val username = tfUsername.text.toString()
-                val email = tfEmail.text.toString()
+                val email = tfEmail.editText?.text.toString()
                 val password = tfPassword.text.toString()
                 val gender = autoCompleteTextView.text.toString()
                 val age = tfUmur.text.toString()
@@ -56,4 +77,9 @@ class RegistrasiActivity : AppCompatActivity() {
         binding?.autoCompleteTextView?.setAdapter(arrayAdapter)
 
     }
+
+    fun isValidEmail(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
 }

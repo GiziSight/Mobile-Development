@@ -6,6 +6,13 @@ import com.example.gizisight.util.LoadingDialog
 import com.example.gizisight.util.SharedPrefManager
 
 class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
+
+    fun getUser(
+        email: String,
+        sharedPrefManager: SharedPrefManager
+    ) =
+        userRepository.getUser(email, sharedPrefManager)
+
     fun loginUser(
         email: String,
         password: String,

@@ -70,24 +70,25 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/tfUsername"
                 android:layout_width="match_parent"
-
+                android:digits="abcdefghijklmnopqrstuvwxyz0123456789."
                 android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.example.gizisight.customview.EmailEditText
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
             android:id="@+id/tfEmail"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:background="@drawable/background_input"
-            android:hint="Masukkan Email"
-            android:inputType="text"
-            android:minHeight="48dp"
-            android:paddingLeft="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-        x
+            android:hint="Email">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/txtInputEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="abcdefghijklmnopqrstuvwxyz0123456789@."/>
+        </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"

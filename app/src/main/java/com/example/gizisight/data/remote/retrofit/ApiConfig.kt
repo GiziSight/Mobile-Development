@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object ApiConfig {
     fun getApiServices(): ApiService {
         val loggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-        val endpoint = "https://login-test-bc32d.et.r.appspot.com/"
+        val endpoint = "https://backend-soewhs74mq-et.a.run.app/"
 
         val client: OkHttpClient = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)

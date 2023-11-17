@@ -53,43 +53,44 @@ class ProfileFragment : Fragment() {
             ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
 
         val sharedPref = SharedPrefManager(requireActivity())
-        val token = sharedPref.getUser()
+        val email = sharedPref.getEmail()
+        val acct = GoogleSignIn.getLastSignedInAccount(requireActivity())
 
-
-        viewModel.getUser("Bearer $token", sharedPref).observe(viewLifecycleOwner){ result ->
-            if (result != null) {
-                when (result) {
-                    is Result.Loading -> {
-                        Toast.makeText(
-                            requireActivity(),
-                            "Loading..",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    is Result.Success -> {
-                        binding.apply {
-                            tvName.text = result.data.username
-                            tvUmur.text = result.data.age.toString() + " Tahun"
-                            tvHeight.text = result.data.height.toString() + " CM"
-                            tvWeight.text = result.data.weight.toString() + " Kg"
-                            tvEmail.text = result.data.email
-                            Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(imgProfile)
+        if (!email.isNullOrEmpty()){
+            viewModel.getUser(email!!, sharedPref).observe(viewLifecycleOwner){ result ->
+                if (result != null) {
+                    when (result) {
+                        is Result.Loading -> {
+//                            Toast.makeText(
+//                                requireActivity(),
+//                                "Loading..",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
                         }
-                    }
-                    is Result.Error -> {
-                        Toast.makeText(
-                            requireActivity(),
-                            result.error,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        is Result.Success -> {
+                            binding.cvProfile.alpha = 1.0f
+                            binding.apply {
+                                tvName.text = result.data.username
+                                tvUmur.text = result.data.age.toString() + " Tahun"
+                                tvHeight.text = result.data.height.toString() + " CM"
+                                tvWeight.text = result.data.weight.toString() + " Kg"
+                                tvEmail.text = result.data.email
+                                Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(imgProfile)
+                            }
+                        }
+                        is Result.Error -> {
+                            Toast.makeText(
+                                requireActivity(),
+                                result.error,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
-        }
 
-
-        val acct = GoogleSignIn.getLastSignedInAccount(requireActivity())
-        if (acct != null) {
+        } else {
+            binding.cvProfile.alpha = 1.0f
             val personName = acct!!.displayName
             val personEmail = acct!!.email
             val personPhoto = acct!!.photoUrl
@@ -99,10 +100,14 @@ class ProfileFragment : Fragment() {
             Glide.with(requireActivity()).load(personPhoto).circleCrop().into(binding.imgProfile)
         }
 
+
+
+
         binding.btnLogout.setOnClickListener {
             Firebase.auth.signOut()
             val sharedPref = SharedPrefManager(requireActivity())
-            val token = sharedPref.removeToken()
+            sharedPref.removeToken()
+            sharedPref.removeEmail()
             val intent = Intent(requireActivity(), LoginActivity::class.java)
             requireActivity().finish()
             startActivity(intent)

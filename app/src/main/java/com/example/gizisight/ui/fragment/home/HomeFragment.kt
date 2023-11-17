@@ -3,6 +3,7 @@ package com.example.gizisight.ui.fragment.home
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,13 +22,17 @@ import com.example.gizisight.ui.fragment.ListNewsAdapter
 import com.example.gizisight.util.SharedPrefManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.example.gizisight.data.Result
+import com.example.gizisight.data.remote.response.ArticleItem
 import com.example.gizisight.ui.AKGActivity
+import com.example.gizisight.ui.DetailArticleActivity
 import com.example.gizisight.ui.registrasi.RegistrasiActivity
+import com.example.gizisight.util.RvClickListener
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), RvClickListener {
 
     private var _binding: FragmentHomeBinding? = null
-    private lateinit var rvHeroes: RecyclerView
     private val list = ArrayList<News>()
 
     // This property is only valid between onCreateView and
@@ -67,25 +72,109 @@ class HomeFragment : Fragment() {
             ViewModelProvider(requireActivity())[HomeViewModel::class.java]
 
         val sharedPref = SharedPrefManager(requireActivity())
-        val token = sharedPref.getUser()
+        var emailPref = sharedPref.getEmail()
+
+        var email = Firebase.auth.currentUser?.email
+
+        val acct = GoogleSignIn.getLastSignedInAccount(requireActivity())
+
+        if( !emailPref.isNullOrEmpty()) {
+            viewModel.getUser(emailPref, sharedPref).observe(viewLifecycleOwner){ result ->
+                if (result != null) {
+                    when (result) {
+                        is Result.Loading -> {
+//                            Toast.makeText(
+//                                requireActivity(),
+//                                "Loading..",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+                        }
+                        is Result.Success -> {
+                            binding.cvHeadline.alpha = 1.0f;
+                            binding.apply {
+                                tvName.text = result.data.username
+                                tvUmur.text = "${result.data.age} Tahun"
+                                tvJenis.text = result.data.gender
+                                Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(ivPhoto)
+
+                            }
+                        }
+                        is Result.Error -> {
+                            Toast.makeText(
+                                requireActivity(),
+                                result.error,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+
+        } else if (!email.isNullOrEmpty()) {
+            viewModel.getUser(email.toString(), sharedPref).observe(viewLifecycleOwner){ result ->
+                if (result != null) {
+                    when (result) {
+                        is Result.Loading -> {
+                            Toast.makeText(
+                                requireActivity(),
+                                "Loading..",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        is Result.Success -> {
+                            binding.cvHeadline.alpha = 1.0f;
+                            binding.apply {
+                                if (acct != null) {
+                                    val personName = acct!!.displayName
+                                    val personPhoto = acct!!.photoUrl
+                                    binding.tvName.text = personName
+                                    tvUmur.text = "${result.data.age} Tahun"
+                                    tvJenis.text = result.data.gender
+                                    Glide.with(requireActivity()).load(personPhoto).circleCrop().into(binding.ivPhoto)
+                                } else {
+                                    tvName.text = result.data.username
+                                    tvUmur.text = "${result.data.age} Tahun"
+                                    tvJenis.text = result.data.gender
+                                    Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(ivPhoto)
+                                }
+
+                            }
+                        }
+                        is Result.Error -> {
+                            Toast.makeText(
+                                requireActivity(),
+                                result.error,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+        }
 
 
-        viewModel.getUser("Bearer $token", sharedPref).observe(viewLifecycleOwner){ result ->
+
+        binding.ivMore.setOnClickListener{
+            val intent = Intent(requireActivity(), AKGActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.rvNews.setHasFixedSize(true)
+
+
+        val query = "gizi harian stunting"
+
+        viewModel.getArticle(query).observe(viewLifecycleOwner){ result ->
             if (result != null) {
                 when (result) {
                     is Result.Loading -> {
-                        Toast.makeText(
-                            requireActivity(),
-                            "Loading..",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Log.d("Loaading", "Loading Article")
                     }
                     is Result.Success -> {
-                        binding.apply {
-                            tvName.text = result.data.username
-                            tvUmur.text = "${result.data.age} Tahun"
-                            tvJenis.text = result.data.gender
-                            Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(ivPhoto)
+                        list.addAll(getListHeroes())
+                        val data = result.data.article
+                        if (data != null) {
+                            showRecyclerList(data)
                         }
                     }
                     is Result.Error -> {
@@ -99,27 +188,8 @@ class HomeFragment : Fragment() {
             }
         }
 
-        binding.ivMore.setOnClickListener{
-            val intent = Intent(requireActivity(), AKGActivity::class.java)
-            startActivity(intent)
-        }
 
 
-        rvHeroes = binding.rvNews
-        rvHeroes.setHasFixedSize(true)
-
-        val acct = GoogleSignIn.getLastSignedInAccount(requireActivity())
-        if (acct != null) {
-            val personName = acct!!.displayName
-            val personPhoto = acct!!.photoUrl
-            binding.tvName.text = personName
-
-            Glide.with(requireActivity()).load(personPhoto).circleCrop().into(binding.ivPhoto)
-
-        }
-
-        list.addAll(getListHeroes())
-        showRecyclerList()
     }
 
     private fun getListHeroes(): ArrayList<News> {
@@ -134,15 +204,24 @@ class HomeFragment : Fragment() {
         return listNews
     }
 
-    private fun showRecyclerList() {
-        rvHeroes.layoutManager =
-            LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
-        val listNewsAdapter = ListNewsAdapter(list)
-        rvHeroes.adapter = listNewsAdapter
+    private fun showRecyclerList(list: List<ArticleItem?>) {
+        val filteredList = list
+        binding.rvNews.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
+        val listNewsAdapter = ListNewsAdapter(filteredList as List<ArticleItem>)
+        listNewsAdapter.listener = this
+        binding.rvNews.adapter = listNewsAdapter
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+    override fun onItemClicked(view: View, data: ArticleItem) {
+        val intent = Intent(requireActivity(), DetailArticleActivity::class.java)
+        intent.putExtra("link", data.link)
+        startActivity(intent)
+    }
+
 }

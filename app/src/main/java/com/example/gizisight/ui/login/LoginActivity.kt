@@ -1,13 +1,19 @@
 package com.example.gizisight.ui.login
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
+import com.bumptech.glide.Glide
 import com.example.gizisight.R
 import com.example.gizisight.ViewModelFactory
+import com.example.gizisight.data.Result
 import com.example.gizisight.databinding.ActivityLoginBinding
 import com.example.gizisight.databinding.ActivityRegistrasiBinding
 import com.example.gizisight.ui.DataDiriActivity
@@ -34,6 +40,10 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var mGoogleSignInClient : GoogleSignInClient
     private lateinit var mAuth : FirebaseAuth
+    private val factory: ViewModelFactory = ViewModelFactory.getInstance(this@LoginActivity)
+    private val viewModel : LoginViewModel by viewModels {
+        factory
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,21 +58,35 @@ class LoginActivity : AppCompatActivity() {
 
 //        supportActionBar?.setCustomView(R.layout.toolbar_title_layout)
 
-        val factory: ViewModelFactory = ViewModelFactory.getInstance(this@LoginActivity)
-        val viewModel: LoginViewModel by viewModels {
-            factory
-        }
+
 
         binding?.apply {
-
-
             btnLogin.setOnClickListener{
                 loadingDialog.startLoadingDialog()
-                val email = tfEmail.text
+                val email = tfEmail.editText?.text
                 val password = tfPassword.editText?.text
                 viewModel.loginUser(email.toString(), password.toString(), this@LoginActivity, userPref, loadingDialog)
             }
 
+            txtInputEmail.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    // Do Nothing
+                }
+
+                override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                    // Validate the email format and show error if needed
+                    if (!isValidEmail(s.toString())) {
+                        tfEmail.error = "Invalid email format"
+                    } else {
+                        tfEmail.error = null // Clear the error
+                    }
+                }
+
+                override fun afterTextChanged(p0: Editable?) {
+                    // Do nothing
+                }
+            })
         }
 
         binding?.btnDaftar?.setOnClickListener {
@@ -106,14 +130,64 @@ class LoginActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         val currentUser = auth.currentUser
+        val sharedPref = SharedPrefManager(this)
+        val email = sharedPref.getEmail()
         if( currentUser != null ){
-            reload()
+
+            val em = currentUser.email
+
+            viewModel.getUser(em!!, sharedPref).observe(this) {result ->
+                if (result != null) {
+                    when (result) {
+                        is Result.Loading -> {
+//                            Toast.makeText(
+//                                this,
+//                                "Loading..",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+                        }
+                        is Result.Success -> {
+                            val intent = Intent(applicationContext, HomeActivity::class.java)
+                            startActivity(intent)
+                        }
+                        is Result.Error -> {
+                            Toast.makeText(
+                                this,
+                                result.error,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+        } else {
+            viewModel.getUser(email!!, sharedPref).observe(this) {result ->
+                if (result != null) {
+                    when (result) {
+                        is Result.Loading -> {
+//                            Toast.makeText(
+//                                this,
+//                                "Loading..",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+                        }
+                        is Result.Success -> {
+                            val intent = Intent(applicationContext, HomeActivity::class.java)
+                            startActivity(intent)
+                        }
+                        is Result.Error -> {
+                            Toast.makeText(
+                                this,
+                                result.error,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
         }
     }
 
-    private fun reload() {
-        startActivity(Intent(applicationContext, DataDiriActivity::class.java))
-    }
 
     fun googleSignIn(){
         var intent = mGoogleSignInClient.signInIntent
@@ -127,29 +201,51 @@ class LoginActivity : AppCompatActivity() {
             val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 var account : GoogleSignInAccount = task.getResult(ApiException::class.java)
-                account.idToken?.let { firebaseAuthWithGoogle(it) }
+                // Get user information
+
+                firebaseAuthWithGoogle(account)
+
+//                account.idToken?.let { firebaseAuthWithGoogle(it) }
+
             } catch (e : ApiException) {
                 Log.d("ERRREROR", e.toString())
             }
         }
     }
 
-    private fun firebaseAuthWithGoogle(idToken : String) {
+    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
         // Got an ID token from Google. Use it to authenticate
         // with Firebase.
-        val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
+        val firebaseCredential = GoogleAuthProvider.getCredential(account.idToken, null)
         auth.signInWithCredential(firebaseCredential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("LIGNGER", "signInWithCredential:success")
                     val user = auth.currentUser
-                    reload()
+                    val intent = Intent(applicationContext, DataDiriActivity::class.java)
+                    intent.putExtra("displayName", account.displayName)
+                    intent.putExtra("email", account.email)
+                    intent.putExtra("username", extractUsername(account.email))
+                    intent.putExtra("photoUrl", extractUsername(account.photoUrl.toString()))
+                    startActivity(intent)
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.w("LIGNGER", "signInWithCredential:failure", task.exception)
-                    reload()
+                    Log.d("LIGNGER", "signInWithCredential:failure", task.exception)
+//                    startActivity(Intent(applicationContext, DataDiriActivity::class.java))
                 }
             }
+    }
+
+    // Function to validate email format
+    fun isValidEmail(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    fun extractUsername(email: String?): String? {
+        val regex = "^(.+)@".toRegex()
+        val matchResult = email?.let { regex.find(it) }
+
+        return matchResult?.groupValues?.get(1)
     }
 }

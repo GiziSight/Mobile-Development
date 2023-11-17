@@ -35,6 +35,12 @@ class SharedPrefManager(private val context: Context) {
         editor.apply()
     }
 
+    fun setEmail(value: String) {
+        val editor = preferences.edit()
+        editor.putString(EMAIL, value)
+        editor.apply()
+    }
+
 
     fun getUser(): String? {
         return preferences.getString(TOKEN_KEY, "")
@@ -67,6 +73,12 @@ class SharedPrefManager(private val context: Context) {
     fun removeToken() {
         val editor = preferences.edit()
         editor.remove(TOKEN_KEY)
+        editor.apply()
+    }
+
+    fun removeEmail() {
+        val editor = preferences.edit()
+        editor.remove(EMAIL)
         editor.apply()
     }
 

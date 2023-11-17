@@ -1,14 +1,13 @@
 package com.example.gizisight.data
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import com.example.gizisight.data.remote.response.GetUserResponse
-import com.example.gizisight.data.remote.response.LoginResponse
-import com.example.gizisight.data.remote.response.MessageResponse
-import com.example.gizisight.data.remote.response.User
+import com.example.gizisight.data.remote.response.*
 import com.example.gizisight.data.remote.retrofit.ApiService
 import com.example.gizisight.errorJson
 import com.example.gizisight.ui.HomeActivity
@@ -32,7 +31,7 @@ class UserRepository(private val apiService: ApiService) {
         age: String,
         height: String,
         weight: String,
-        activity: RegistrasiActivity,
+        activity: Activity,
         loadingDialog: LoadingDialog,
     ) {
         val client = apiService.registerUser(email, username, password, gender, age, height, weight)
@@ -52,7 +51,8 @@ class UserRepository(private val apiService: ApiService) {
                             responseBody.message.toString(),
                             Toast.LENGTH_SHORT
                         ).show()
-                        activity.finish()
+                        val intent = Intent(activity, HomeActivity::class.java)
+                        activity.startActivity(intent)
                     } else {
                         val errorBody = response.errorBody()?.string()
                         Toast.makeText(activity, errorBody, Toast.LENGTH_SHORT).show()
@@ -92,13 +92,14 @@ class UserRepository(private val apiService: ApiService) {
     }
 
     fun getUser(
-        token: String,
+        email: String,
         userPref: SharedPrefManager
     ) : LiveData<Result<User>> {
         val user = MediatorLiveData<Result<User>>()
 
+        Log.d("AFsDASD", email)
         user.postValue(Result.Loading)
-        val client = apiService.getUser(token)
+        val client = apiService.getUser(email)
         client.enqueue(object : Callback<GetUserResponse> {
             override fun onResponse(
                 call: Call<GetUserResponse>,
@@ -129,6 +130,42 @@ class UserRepository(private val apiService: ApiService) {
         return user;
     }
 
+    fun getArticle(
+        query: String,
+    ) : LiveData<Result<ArticleResponse>> {
+        val article = MediatorLiveData<Result<ArticleResponse>>()
+
+        article.postValue(Result.Loading)
+        val client = apiService.getArticle(query)
+        client.enqueue(object : Callback<ArticleResponse> {
+            override fun onResponse(
+                call: Call<ArticleResponse>,
+                response: Response<ArticleResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    Log.d("REf2efee2", responseBody.toString())
+                    if (responseBody != null) {
+                        article.value = Result.Success(responseBody)
+                        Log.d("REf2efee2", responseBody.toString())
+                    } else {
+                        val errorBody = response.errorBody()?.string()
+                        Log.d("REf2efee2", errorBody.toString())
+                        article.postValue(Result.Error("Error ${response.code()}"))
+                    }
+                }
+            }
+
+
+            override fun onFailure(call: Call<ArticleResponse>, t: Throwable) {
+                Log.d("REf2efee2", t.toString())
+                article.postValue(Result.Error(t.message.toString()))
+            }
+        })
+
+        return article;
+    }
+
 
     fun loginUser(
         email: String,
@@ -144,7 +181,7 @@ class UserRepository(private val apiService: ApiService) {
                     loadingDialog.dismiss()
                     val responseBody = response.body()
                     if (responseBody != null) {
-                        userPref.setToken(responseBody)
+                        userPref.setEmail(email)
                         val intent = Intent(activity, HomeActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
                         activity.finish()

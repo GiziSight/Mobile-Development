@@ -9,8 +9,13 @@ import com.example.gizisight.util.SharedPrefManager
 class HomeViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     fun getUser(
-        token: String,
+        email: String,
         sharedPrefManager: SharedPrefManager
     ) =
-        userRepository.getUser(token, sharedPrefManager)
+        userRepository.getUser(email, sharedPrefManager)
+
+    fun getArticle(
+        query: String,
+    ) =
+        userRepository.getArticle(query)
 }

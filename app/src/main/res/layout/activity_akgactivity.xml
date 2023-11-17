@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -54,9 +54,10 @@
                 android:src="@drawable/bg_akg" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
+                android:layout_marginRight="10dp"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal">
 
@@ -94,14 +95,9 @@
                             app:icon="@drawable/baseline_calendar_month_24"
                             app:iconTint="@color/white" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="|"
-                            android:textColor="@color/white" />
 
                         <Button
-                            android:id="@+id/tvJenis"
+                            android:id="@+id/tvTinggi"
                             style="@style/Widget.Material3.Button.TextButton.Icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -112,11 +108,11 @@
                             app:icon="@drawable/round_person_24"
                             app:iconTint="@color/white" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="|"
-                            android:textColor="@color/white" />
+<!--                        <TextView-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="|"-->
+<!--                            android:textColor="@color/white" />-->
 
                         <Button
                             android:id="@+id/tvBerat"
@@ -135,11 +131,10 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
                         android:fontFamily="@font/poppins_medium"
-                        android:text="*Angka Kecukupan Gizi (AKG) Usia 0-5 bulan dengan berat badan 6kg dan  tinggi badan 60cm. "
+                        android:text="Angka Kecukupan Gizi (AKG) Usia 0-5 bulan dengan berat badan 6 kg dan tinggi badan 60 cm "
                         android:textColor="@color/white"
-                        android:textSize="13sp" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="match_parent"

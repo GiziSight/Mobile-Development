@@ -64,7 +64,6 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Pilih Jenis Kelamin"
             app:layout_constraintEnd_toEndOf="parent"
             app:hintTextColor="#8C8F93"
             app:layout_constraintStart_toStartOf="parent"
@@ -72,13 +71,14 @@
             android:layout_marginBottom="24dp">
 
             <AutoCompleteTextView
+                android:text="Pilih Jenis Kelamin"
                 android:id="@+id/autoCompleteTextView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:inputType="none"
                 android:textColor="#8C8F93"
-                android:text="Pilih Jenis Kelamin" />
+                tools:text="Pilih Jenis Kelamin" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout

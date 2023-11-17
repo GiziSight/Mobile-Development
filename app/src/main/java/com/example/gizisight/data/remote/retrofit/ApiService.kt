@@ -1,5 +1,6 @@
 package com.example.gizisight.data.remote.retrofit
 
+import com.example.gizisight.data.remote.response.ArticleResponse
 import com.example.gizisight.data.remote.response.GetUserResponse
 import com.example.gizisight.data.remote.response.LoginResponse
 import com.example.gizisight.data.remote.response.MessageResponse
@@ -29,10 +30,16 @@ interface ApiService {
         @Field("password") password: String
     ): Call<LoginResponse>
 
+
     @GET("getUser")
     fun getUser(
-        @Header("Authorization") token: String,
+        @Query("email") email: String,
     ): Call<GetUserResponse>
+
+    @GET("api/search")
+    fun getArticle(
+        @Query("query") query: String,
+    ): Call<ArticleResponse>
 
 //    @Multipart
 //    @POST("stories")
