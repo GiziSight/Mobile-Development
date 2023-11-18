@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.example.gizisight.R
 import com.example.gizisight.ViewModelFactory
 import com.example.gizisight.data.Result
 import com.example.gizisight.databinding.FragmentProfileBinding
@@ -53,11 +54,12 @@ class ProfileFragment : Fragment() {
             ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
 
         val sharedPref = SharedPrefManager(requireActivity())
-        val email = sharedPref.getEmail()
+        val emailPref = sharedPref.getEmail()
         val acct = GoogleSignIn.getLastSignedInAccount(requireActivity())
+        var email = Firebase.auth.currentUser?.email
 
-        if (!email.isNullOrEmpty()){
-            viewModel.getUser(email!!, sharedPref).observe(viewLifecycleOwner){ result ->
+        if (!emailPref.isNullOrEmpty()){
+            viewModel.getUser(emailPref!!, sharedPref).observe(viewLifecycleOwner){ result ->
                 if (result != null) {
                     when (result) {
                         is Result.Loading -> {
@@ -75,7 +77,18 @@ class ProfileFragment : Fragment() {
                                 tvHeight.text = result.data.height.toString() + " CM"
                                 tvWeight.text = result.data.weight.toString() + " Kg"
                                 tvEmail.text = result.data.email
-                                Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(imgProfile)
+                                when (result.data.gender) {
+                                    "Laki-laki", "MALE" -> {
+                                        Glide.with(requireActivity()).load(R.drawable.man2).circleCrop().into(imgProfile)
+                                    }
+                                    "Perempuan", "FEMALE" -> {
+                                        Glide.with(requireActivity()).load(R.drawable.girl2).circleCrop().into(imgProfile)
+                                    }
+                                    else -> {
+                                        Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(imgProfile)
+                                    }
+                                }
+
                             }
                         }
                         is Result.Error -> {
@@ -89,15 +102,57 @@ class ProfileFragment : Fragment() {
                 }
             }
 
-        } else {
-            binding.cvProfile.alpha = 1.0f
-            val personName = acct!!.displayName
-            val personEmail = acct!!.email
-            val personPhoto = acct!!.photoUrl
+        } else if (!email.isNullOrEmpty()) {
+            viewModel.getUser(email.toString(), sharedPref).observe(viewLifecycleOwner){ result ->
+                if (result != null) {
+                    when (result) {
+                        is Result.Loading -> {
+                            Toast.makeText(
+                                requireActivity(),
+                                "Loading..",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        is Result.Success -> {
+                            binding.apply {
+                                if (acct != null) {
+                                    val personName = acct!!.displayName
+                                    val personPhoto = acct!!.photoUrl
+                                    binding.tvName.text = personName
+                                    tvUmur.text = "${result.data.age} Tahun"
+                                    tvHeight.text = result.data.height.toString() + " Kg"
+                                    tvWeight.text = result.data.weight.toString() + " Kg"
+                                    Glide.with(requireActivity()).load(personPhoto).circleCrop().into(binding.imgProfile)
+                                } else {
+                                    tvName.text = result.data.username
+                                    tvUmur.text = "${result.data.age} Tahun"
+                                    tvHeight.text = result.data.height.toString() + " Kg"
+                                    tvWeight.text = result.data.weight.toString() + " Kg"
+                                    when (result.data.gender) {
+                                        "Laki-laki", "MALE" -> {
+                                            Glide.with(requireActivity()).load(R.drawable.man2).circleCrop().into(imgProfile)
+                                        }
+                                        "Perempuan", "FEMALE" -> {
+                                            Glide.with(requireActivity()).load(R.drawable.girl2).circleCrop().into(imgProfile)
+                                        }
+                                        else -> {
+                                            Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(imgProfile)
+                                        }
+                                    }
+                                }
 
-            binding.tvName.text = personName.toString()
-            binding.tvEmail.text = personEmail.toString()
-            Glide.with(requireActivity()).load(personPhoto).circleCrop().into(binding.imgProfile)
+                            }
+                        }
+                        is Result.Error -> {
+                            Toast.makeText(
+                                requireActivity(),
+                                result.error,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
         }
 
 

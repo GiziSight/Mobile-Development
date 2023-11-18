@@ -95,7 +95,17 @@ class HomeFragment : Fragment(), RvClickListener {
                                 tvName.text = result.data.username
                                 tvUmur.text = "${result.data.age} Tahun"
                                 tvJenis.text = result.data.gender
-                                Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(ivPhoto)
+                                when (result.data.gender) {
+                                    "Laki-laki", "MALE" -> {
+                                        Glide.with(requireActivity()).load(R.drawable.man2).circleCrop().into(ivPhoto)
+                                    }
+                                    "Perempuan", "FEMALE" -> {
+                                        Glide.with(requireActivity()).load(R.drawable.girl2).circleCrop().into(ivPhoto)
+                                    }
+                                    else -> {
+                                        Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(ivPhoto)
+                                    }
+                                }
 
                             }
                         }
@@ -130,12 +140,22 @@ class HomeFragment : Fragment(), RvClickListener {
                                     binding.tvName.text = personName
                                     tvUmur.text = "${result.data.age} Tahun"
                                     tvJenis.text = result.data.gender
-                                    Glide.with(requireActivity()).load(personPhoto).circleCrop().into(binding.ivPhoto)
+
                                 } else {
                                     tvName.text = result.data.username
                                     tvUmur.text = "${result.data.age} Tahun"
                                     tvJenis.text = result.data.gender
-                                    Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(ivPhoto)
+                                    when (result.data.gender) {
+                                        "Laki-laki", "MALE" -> {
+                                            Glide.with(requireActivity()).load(R.drawable.man2).circleCrop().into(ivPhoto)
+                                        }
+                                        "Perempuan", "FEMALE" -> {
+                                            Glide.with(requireActivity()).load(R.drawable.girl2).circleCrop().into(ivPhoto)
+                                        }
+                                        else -> {
+                                            Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(ivPhoto)
+                                        }
+                                    }
                                 }
 
                             }
