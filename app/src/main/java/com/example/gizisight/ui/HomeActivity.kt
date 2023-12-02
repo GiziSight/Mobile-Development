@@ -1,6 +1,8 @@
 package com.example.gizisight.ui
 
 import android.os.Bundle
+import android.os.Handler
+import android.widget.Toast
 import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +17,7 @@ import com.example.gizisight.ui.fragment.home.HomeViewModel
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
+    private var isBackPressedOnce: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,5 +38,21 @@ class HomeActivity : AppCompatActivity() {
             )
         )
         navView.setupWithNavController(navController)
+    }
+
+    override fun onBackPressed() {
+        if (isBackPressedOnce) {
+            super.onBackPressed()
+            return
+        }
+
+        Toast.makeText(this, "Tekan tombol kembali dua kali untuk keluar dari aplikasi", Toast.LENGTH_SHORT).show()
+
+        isBackPressedOnce = true;
+
+        Handler().postDelayed({
+            isBackPressedOnce = false
+        }, 200)
+
     }
 }

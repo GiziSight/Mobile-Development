@@ -26,6 +26,7 @@ class DataDiriViewModel(private val userRepository: UserRepository) : ViewModel(
         weight: String,
         activity: Activity,
         loadingDialog: LoadingDialog,
+        userPref : SharedPrefManager
     ) =
-        userRepository.registerUser(email, username, password, gender, age, height, weight, activity, loadingDialog)
+        userRepository.registerUser(email, username, password, gender, age, height, weight, activity, loadingDialog, userPref)
 }

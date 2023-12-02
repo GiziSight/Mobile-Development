@@ -5,9 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.gizisight.data.UserRepository
 import com.example.gizisight.di.Injection
-import com.example.gizisight.ui.AKGViewModel
+import com.example.gizisight.ui.akg.AKGViewModel
 import com.example.gizisight.ui.DataDiriViewModel
 import com.example.gizisight.ui.IntroViewModel
+import com.example.gizisight.ui.fragment.camera.CameraViewModel
 import com.example.gizisight.ui.fragment.home.HomeViewModel
 import com.example.gizisight.ui.fragment.profile.ProfileViewModel
 import com.example.gizisight.ui.login.LoginViewModel
@@ -27,10 +28,12 @@ class ViewModelFactory private constructor(private val userRepository: UserRepos
             return ProfileViewModel(userRepository) as T
         } else if (modelClass.isAssignableFrom(AKGViewModel::class.java)) {
             return AKGViewModel(userRepository) as T
-        }else if (modelClass.isAssignableFrom(DataDiriViewModel::class.java)) {
+        } else if (modelClass.isAssignableFrom(DataDiriViewModel::class.java)) {
             return DataDiriViewModel(userRepository) as T
-        }else if (modelClass.isAssignableFrom(IntroViewModel::class.java)) {
+        } else if (modelClass.isAssignableFrom(IntroViewModel::class.java)) {
             return IntroViewModel(userRepository) as T
+        } else if (modelClass.isAssignableFrom(CameraViewModel::class.java)) {
+            return CameraViewModel(userRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
     }

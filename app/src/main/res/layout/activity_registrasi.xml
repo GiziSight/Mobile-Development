@@ -130,13 +130,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:hint="Umur">
+            android:hint="Tanggal Lahir">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/tfUmur"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number" />
+                android:clickable="false"
+                android:cursorVisible="false"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -169,7 +173,7 @@
                 android:id="@+id/tfBeratBadan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number" />
+                android:inputType="numberDecimal" />
         </com.google.android.material.textfield.TextInputLayout>
 
 

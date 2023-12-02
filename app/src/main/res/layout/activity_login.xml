@@ -93,22 +93,23 @@
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
-            android:id="@+id/btnLupa"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:fontFamily="@font/poppins_medium"
-            android:text="Lupa Password?"
-            android:textColor="#B1B5BA"
-            android:textSize="14sp" />
+<!--        <Button-->
+<!--            android:id="@+id/btnLupa"-->
+<!--            style="@style/Widget.Material3.Button.TextButton"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="end"-->
+<!--            android:fontFamily="@font/poppins_medium"-->
+<!--            android:text="Lupa Password?"-->
+<!--            android:textColor="#B1B5BA"-->
+<!--            android:textSize="14sp" />-->
 
 
         <Button
             android:id="@+id/btnLogin"
             style="@style/Widget.Material3.Button.ElevatedButton"
             android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
             android:layout_height="wrap_content"
             android:backgroundTint="#ABC270"
             android:fontFamily="@font/poppins_semibold"

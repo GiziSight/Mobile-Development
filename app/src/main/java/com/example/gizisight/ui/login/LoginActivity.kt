@@ -77,7 +77,7 @@ class LoginActivity : AppCompatActivity() {
 
                     // Validate the email format and show error if needed
                     if (!isValidEmail(s.toString())) {
-                        tfEmail.error = "Invalid email format"
+                        tfEmail.error = "Format email salah"
                     } else {
                         tfEmail.error = null // Clear the error
                     }
@@ -190,6 +190,7 @@ class LoginActivity : AppCompatActivity() {
 
 
     fun googleSignIn(){
+        mGoogleSignInClient.signOut()
         var intent = mGoogleSignInClient.signInIntent
         startActivityForResult(intent,  1001)
     }

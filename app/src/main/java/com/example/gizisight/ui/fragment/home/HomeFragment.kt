@@ -10,12 +10,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.gizisight.R
 import com.example.gizisight.ViewModelFactory
+import com.example.gizisight.capitalizeFirstLetterEachWord
 import com.example.gizisight.data.News
 import com.example.gizisight.databinding.FragmentHomeBinding
 import com.example.gizisight.ui.fragment.ListNewsAdapter
@@ -23,9 +22,8 @@ import com.example.gizisight.util.SharedPrefManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.example.gizisight.data.Result
 import com.example.gizisight.data.remote.response.ArticleItem
-import com.example.gizisight.ui.AKGActivity
+import com.example.gizisight.ui.akg.AKGActivity
 import com.example.gizisight.ui.DetailArticleActivity
-import com.example.gizisight.ui.registrasi.RegistrasiActivity
 import com.example.gizisight.util.RvClickListener
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -46,9 +44,11 @@ class HomeFragment : Fragment(), RvClickListener {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         viewModelFactory = ViewModelFactory.getInstance(requireContext())
-        viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[HomeViewModel::class.java]
+        viewModel =
+            ViewModelProvider(requireActivity(), viewModelFactory)[HomeViewModel::class.java]
 
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -78,8 +78,8 @@ class HomeFragment : Fragment(), RvClickListener {
 
         val acct = GoogleSignIn.getLastSignedInAccount(requireActivity())
 
-        if( !emailPref.isNullOrEmpty()) {
-            viewModel.getUser(emailPref, sharedPref).observe(viewLifecycleOwner){ result ->
+        if (!email.isNullOrEmpty()) {
+            viewModel.getUser(email.toString(), sharedPref).observe(viewLifecycleOwner) { result ->
                 if (result != null) {
                     when (result) {
                         is Result.Loading -> {
@@ -92,18 +92,65 @@ class HomeFragment : Fragment(), RvClickListener {
                         is Result.Success -> {
                             binding.cvHeadline.alpha = 1.0f;
                             binding.apply {
-                                tvName.text = result.data.username
-                                tvUmur.text = "${result.data.age} Tahun"
-                                tvJenis.text = result.data.gender
-                                when (result.data.gender) {
-                                    "Laki-laki", "MALE" -> {
-                                        Glide.with(requireActivity()).load(R.drawable.man2).circleCrop().into(ivPhoto)
-                                    }
-                                    "Perempuan", "FEMALE" -> {
-                                        Glide.with(requireActivity()).load(R.drawable.girl2).circleCrop().into(ivPhoto)
-                                    }
+                                val user = result.data.user
+                                val akgData = result.data.akgData
+
+                                val jenis = when (user.gender) {
+                                    "Female" -> "Perempuan"
+                                    "Male", "MALE" -> "Laki-laki"
                                     else -> {
-                                        Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(ivPhoto)
+                                        // Handle other gender values if needed
+                                        // For example, if user.gender is neither "Female" nor "Male", set jenis to some default value
+                                        "SomeOtherValue" // Change this to a value you prefer for other cases
+                                    }
+                                }
+
+
+                                if (acct != null) {
+                                    val personName = capitalizeFirstLetterEachWord(acct.displayName)
+                                    val personPhoto = acct.photoUrl
+                                    binding.tvName.text = personName
+                                    tvUmur.text = "${user.age}"
+                                    tvJenis.text = jenis
+
+                                    tvKaloriName.text = akgData.bagian1[0].name
+                                    tvKaloriValue.text = akgData.bagian1[0].nilai
+
+                                    tvProteinName.text = akgData.bagian1[1].name
+                                    tvProteinValue.text = akgData.bagian1[1].nilai
+
+                                    tvSeratName.text = akgData.bagian1[7].name
+                                    tvSeratValue.text = akgData.bagian1[7].nilai
+
+                                    Glide.with(requireActivity()).load(acct.photoUrl).circleCrop()
+                                        .into(ivPhoto)
+                                } else {
+                                    tvName.text = capitalizeFirstLetterEachWord(user.username)
+                                    tvUmur.text = "${user.age}"
+                                    tvKaloriName.text = akgData.bagian1[0].name
+                                    tvKaloriValue.text = akgData.bagian1[0].nilai
+
+                                    tvProteinName.text = akgData.bagian1[1].name
+                                    tvProteinValue.text = akgData.bagian1[1].nilai
+
+                                    tvSeratName.text = akgData.bagian1[7].name
+                                    tvSeratValue.text = akgData.bagian1[7].nilai
+
+                                    tvJenis.text = jenis
+                                    when (user.gender) {
+                                        "Laki-laki", "Male", "MALE" -> {
+                                            Glide.with(requireActivity()).load(R.drawable.man2)
+                                                .circleCrop().into(ivPhoto)
+                                        }
+                                        "Perempuan", "Female" -> {
+                                            Glide.with(requireActivity()).load(R.drawable.girl2)
+                                                .circleCrop().into(ivPhoto)
+                                        }
+                                        else -> {
+                                            Glide.with(requireActivity())
+                                                .load("https://ui-avatars.com/api/?name=${user.username}")
+                                                .circleCrop().into(ivPhoto)
+                                        }
                                     }
                                 }
 
@@ -119,42 +166,58 @@ class HomeFragment : Fragment(), RvClickListener {
                     }
                 }
             }
-
-        } else if (!email.isNullOrEmpty()) {
-            viewModel.getUser(email.toString(), sharedPref).observe(viewLifecycleOwner){ result ->
+        } else if (!emailPref.isNullOrEmpty()) {
+            viewModel.getUser(emailPref, sharedPref).observe(viewLifecycleOwner) { result ->
                 if (result != null) {
                     when (result) {
                         is Result.Loading -> {
-                            Toast.makeText(
-                                requireActivity(),
-                                "Loading..",
-                                Toast.LENGTH_SHORT
-                            ).show()
+//                            Toast.makeText(
+//                                requireActivity(),
+//                                "Loading..",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
                         }
                         is Result.Success -> {
+                            val user = result.data.user
+                            val akgData = result.data.akgData
                             binding.cvHeadline.alpha = 1.0f;
-                            binding.apply {
-                                if (acct != null) {
-                                    val personName = acct!!.displayName
-                                    val personPhoto = acct!!.photoUrl
-                                    binding.tvName.text = personName
-                                    tvUmur.text = "${result.data.age} Tahun"
-                                    tvJenis.text = result.data.gender
+                            val jenis = when (user.gender) {
+                                "Female" -> "Perempuan"
+                                "Male", "MALE" -> "Laki-laki"
+                                else -> {
+                                    // Handle other gender values if needed
+                                    // For example, if user.gender is neither "Female" nor "Male", set jenis to some default value
+                                    "SomeOtherValue" // Change this to a value you prefer for other cases
+                                }
+                            }
 
-                                } else {
-                                    tvName.text = result.data.username
-                                    tvUmur.text = "${result.data.age} Tahun"
-                                    tvJenis.text = result.data.gender
-                                    when (result.data.gender) {
-                                        "Laki-laki", "MALE" -> {
-                                            Glide.with(requireActivity()).load(R.drawable.man2).circleCrop().into(ivPhoto)
-                                        }
-                                        "Perempuan", "FEMALE" -> {
-                                            Glide.with(requireActivity()).load(R.drawable.girl2).circleCrop().into(ivPhoto)
-                                        }
-                                        else -> {
-                                            Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(ivPhoto)
-                                        }
+                            binding.apply {
+                                tvName.text = capitalizeFirstLetterEachWord(user.username)
+                                tvUmur.text = "${user.age}"
+                                tvKaloriName.text = akgData.bagian1[0].name
+                                tvKaloriValue.text = akgData.bagian1[0].nilai
+
+                                tvProteinName.text = akgData.bagian1[1].name
+                                tvProteinValue.text = akgData.bagian1[1].nilai
+
+                                tvSeratName.text = akgData.bagian1[7].name
+                                tvSeratValue.text = akgData.bagian1[7].nilai
+
+
+                                tvJenis.text = jenis
+                                when (user.gender) {
+                                    "Laki-laki", "Male", "MALE" -> {
+                                        Glide.with(requireActivity()).load(R.drawable.man2)
+                                            .circleCrop().into(ivPhoto)
+                                    }
+                                    "Perempuan", "Female" -> {
+                                        Glide.with(requireActivity()).load(R.drawable.girl2)
+                                            .circleCrop().into(ivPhoto)
+                                    }
+                                    else -> {
+                                        Glide.with(requireActivity())
+                                            .load("https://ui-avatars.com/api/?name=${user.username}")
+                                            .circleCrop().into(ivPhoto)
                                     }
                                 }
 
@@ -170,11 +233,15 @@ class HomeFragment : Fragment(), RvClickListener {
                     }
                 }
             }
+
+        } else {
+            Toast.makeText(requireActivity(), "Silahkan login kembali", Toast.LENGTH_SHORT).show()
+            requireActivity().finish()
         }
 
 
 
-        binding.ivMore.setOnClickListener{
+        binding.ivMore.setOnClickListener {
             val intent = Intent(requireActivity(), AKGActivity::class.java)
             startActivity(intent)
         }
@@ -184,7 +251,7 @@ class HomeFragment : Fragment(), RvClickListener {
 
         val query = "gizi harian stunting"
 
-        viewModel.getArticle(query).observe(viewLifecycleOwner){ result ->
+        viewModel.getArticle(query).observe(viewLifecycleOwner) { result ->
             if (result != null) {
                 when (result) {
                     is Result.Loading -> {
@@ -209,7 +276,6 @@ class HomeFragment : Fragment(), RvClickListener {
         }
 
 
-
     }
 
     private fun getListHeroes(): ArrayList<News> {
@@ -226,7 +292,8 @@ class HomeFragment : Fragment(), RvClickListener {
 
     private fun showRecyclerList(list: List<ArticleItem?>) {
         val filteredList = list
-        binding.rvNews.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
+        binding.rvNews.layoutManager =
+            LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
         val listNewsAdapter = ListNewsAdapter(filteredList as List<ArticleItem>)
         listNewsAdapter.listener = this
         binding.rvNews.adapter = listNewsAdapter

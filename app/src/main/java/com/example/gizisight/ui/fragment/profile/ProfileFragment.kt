@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.gizisight.R
 import com.example.gizisight.ViewModelFactory
+import com.example.gizisight.capitalizeFirstLetterEachWord
 import com.example.gizisight.data.Result
 import com.example.gizisight.databinding.FragmentProfileBinding
 import com.example.gizisight.ui.login.LoginActivity
@@ -35,8 +36,10 @@ class ProfileFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         viewModelFactory = ViewModelFactory.getInstance(requireContext())
-        viewModel = ViewModelProvider(requireActivity(), viewModelFactory)[ProfileViewModel::class.java]
+        viewModel =
+            ViewModelProvider(requireActivity(), viewModelFactory)[ProfileViewModel::class.java]
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,8 +61,8 @@ class ProfileFragment : Fragment() {
         val acct = GoogleSignIn.getLastSignedInAccount(requireActivity())
         var email = Firebase.auth.currentUser?.email
 
-        if (!emailPref.isNullOrEmpty()){
-            viewModel.getUser(emailPref!!, sharedPref).observe(viewLifecycleOwner){ result ->
+        if (!email.isNullOrEmpty()) {
+            viewModel.getUser(email.toString(), sharedPref).observe(viewLifecycleOwner) { result ->
                 if (result != null) {
                     when (result) {
                         is Result.Loading -> {
@@ -70,22 +73,39 @@ class ProfileFragment : Fragment() {
 //                            ).show()
                         }
                         is Result.Success -> {
-                            binding.cvProfile.alpha = 1.0f
+                            binding.cvProfile.alpha = 1.0f;
+                            val user = result.data.user
                             binding.apply {
-                                tvName.text = result.data.username
-                                tvUmur.text = result.data.age.toString() + " Tahun"
-                                tvHeight.text = result.data.height.toString() + " CM"
-                                tvWeight.text = result.data.weight.toString() + " Kg"
-                                tvEmail.text = result.data.email
-                                when (result.data.gender) {
-                                    "Laki-laki", "MALE" -> {
-                                        Glide.with(requireActivity()).load(R.drawable.man2).circleCrop().into(imgProfile)
-                                    }
-                                    "Perempuan", "FEMALE" -> {
-                                        Glide.with(requireActivity()).load(R.drawable.girl2).circleCrop().into(imgProfile)
-                                    }
-                                    else -> {
-                                        Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(imgProfile)
+                                if (acct != null) {
+                                    val personName = capitalizeFirstLetterEachWord(acct!!.displayName)
+                                    val personPhoto = acct!!.photoUrl
+                                    binding.tvName.text = capitalizeFirstLetterEachWord(personName)
+                                    binding.tvEmail.text = acct.email
+                                    tvUmur.text = "${user.age}"
+                                    tvHeight.text = user.height.toString() + " cm"
+                                    tvWeight.text = user.weight.toString() + " Kg"
+                                    Glide.with(requireActivity()).load(personPhoto).circleCrop()
+                                        .into(binding.imgProfile)
+                                } else {
+                                    tvName.text = capitalizeFirstLetterEachWord(user.username)
+                                    tvName.text = user.email
+                                    tvUmur.text = "${user.age}"
+                                    tvHeight.text = user.height.toString() + " cm"
+                                    tvWeight.text = user.weight.toString() + " Kg"
+                                    when (user.gender) {
+                                        "Laki-laki", "MALE", "Male" -> {
+                                            Glide.with(requireActivity()).load(R.drawable.man2)
+                                                .circleCrop().into(imgProfile)
+                                        }
+                                        "Perempuan", "FEMALE" -> {
+                                            Glide.with(requireActivity()).load(R.drawable.girl2)
+                                                .circleCrop().into(imgProfile)
+                                        }
+                                        else -> {
+                                            Glide.with(requireActivity())
+                                                .load("https://ui-avatars.com/api/?name=${user.username}")
+                                                .circleCrop().into(imgProfile)
+                                        }
                                     }
                                 }
 
@@ -101,43 +121,39 @@ class ProfileFragment : Fragment() {
                     }
                 }
             }
-
-        } else if (!email.isNullOrEmpty()) {
-            viewModel.getUser(email.toString(), sharedPref).observe(viewLifecycleOwner){ result ->
+        } else if (!emailPref.isNullOrEmpty()) {
+            viewModel.getUser(emailPref!!, sharedPref).observe(viewLifecycleOwner) { result ->
                 if (result != null) {
                     when (result) {
                         is Result.Loading -> {
-                            Toast.makeText(
-                                requireActivity(),
-                                "Loading..",
-                                Toast.LENGTH_SHORT
-                            ).show()
+//                            Toast.makeText(
+//                                requireActivity(),
+//                                "Loading..",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
                         }
                         is Result.Success -> {
+                            val user = result.data.user
+                            binding.cvProfile.alpha = 1.0f
                             binding.apply {
-                                if (acct != null) {
-                                    val personName = acct!!.displayName
-                                    val personPhoto = acct!!.photoUrl
-                                    binding.tvName.text = personName
-                                    tvUmur.text = "${result.data.age} Tahun"
-                                    tvHeight.text = result.data.height.toString() + " Kg"
-                                    tvWeight.text = result.data.weight.toString() + " Kg"
-                                    Glide.with(requireActivity()).load(personPhoto).circleCrop().into(binding.imgProfile)
-                                } else {
-                                    tvName.text = result.data.username
-                                    tvUmur.text = "${result.data.age} Tahun"
-                                    tvHeight.text = result.data.height.toString() + " Kg"
-                                    tvWeight.text = result.data.weight.toString() + " Kg"
-                                    when (result.data.gender) {
-                                        "Laki-laki", "MALE" -> {
-                                            Glide.with(requireActivity()).load(R.drawable.man2).circleCrop().into(imgProfile)
-                                        }
-                                        "Perempuan", "FEMALE" -> {
-                                            Glide.with(requireActivity()).load(R.drawable.girl2).circleCrop().into(imgProfile)
-                                        }
-                                        else -> {
-                                            Glide.with(requireActivity()).load("https://ui-avatars.com/api/?name=${result.data.username}").circleCrop().into(imgProfile)
-                                        }
+                                tvName.text = capitalizeFirstLetterEachWord(user.username)
+                                tvUmur.text = user.age.toString()
+                                tvHeight.text = user.height.toString() + " CM"
+                                tvWeight.text = user.weight.toString() + " Kg"
+                                tvEmail.text = user.email
+                                when (user.gender) {
+                                    "Laki-laki", "Male", "MALE" -> {
+                                        Glide.with(requireActivity()).load(R.drawable.man2)
+                                            .circleCrop().into(imgProfile)
+                                    }
+                                    "Perempuan", "Female" -> {
+                                        Glide.with(requireActivity()).load(R.drawable.girl2)
+                                            .circleCrop().into(imgProfile)
+                                    }
+                                    else -> {
+                                        Glide.with(requireActivity())
+                                            .load("https://ui-avatars.com/api/?name=${user.username}")
+                                            .circleCrop().into(imgProfile)
                                     }
                                 }
 
@@ -153,6 +169,10 @@ class ProfileFragment : Fragment() {
                     }
                 }
             }
+
+        } else {
+            Toast.makeText(requireActivity(), "Silahkan login kembali", Toast.LENGTH_SHORT).show()
+            requireActivity().finish()
         }
 
 
@@ -164,6 +184,7 @@ class ProfileFragment : Fragment() {
             sharedPref.removeToken()
             sharedPref.removeEmail()
             val intent = Intent(requireActivity(), LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
             requireActivity().finish()
             startActivity(intent)
         }

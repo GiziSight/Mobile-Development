@@ -3,6 +3,7 @@ package com.example.gizisight.ui.registrasi
 import androidx.lifecycle.ViewModel
 import com.example.gizisight.data.UserRepository
 import com.example.gizisight.util.LoadingDialog
+import com.example.gizisight.util.SharedPrefManager
 
 class RegistrasiViewModel(private val userRepository: UserRepository) : ViewModel() {
     fun registerUser(
@@ -15,6 +16,7 @@ class RegistrasiViewModel(private val userRepository: UserRepository) : ViewMode
         weight: String,
         activity: RegistrasiActivity,
         loadingDialog: LoadingDialog,
+        userPref: SharedPrefManager
     ) =
-        userRepository.registerUser(email, username, password, gender, age, height, weight, activity, loadingDialog)
+        userRepository.registerUser(email, username, password, gender, age, height, weight, activity, loadingDialog, userPref)
 }

@@ -23,10 +23,13 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ui.HasilPrediksiActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.DetailArticleActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.AKGActivity"
+            android:name=".ui.akg.AKGActivity"
             android:exported="false"
             android:parentActivityName=".ui.HomeActivity" />
         <activity

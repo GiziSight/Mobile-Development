@@ -1,7 +1,6 @@
 package com.example.gizisight.data
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
@@ -11,10 +10,10 @@ import com.example.gizisight.data.remote.response.*
 import com.example.gizisight.data.remote.retrofit.ApiService
 import com.example.gizisight.errorJson
 import com.example.gizisight.ui.HomeActivity
-import com.example.gizisight.ui.registrasi.RegistrasiActivity
 import com.example.gizisight.ui.login.LoginActivity
 import com.example.gizisight.util.LoadingDialog
 import com.example.gizisight.util.SharedPrefManager
+import okhttp3.MultipartBody
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Call
@@ -33,7 +32,9 @@ class UserRepository(private val apiService: ApiService) {
         weight: String,
         activity: Activity,
         loadingDialog: LoadingDialog,
+        userPref: SharedPrefManager
     ) {
+        Log.d("fasdzz", age)
         val client = apiService.registerUser(email, username, password, gender, age, height, weight)
         client.enqueue(object : Callback<MessageResponse> {
             override fun onResponse(
@@ -45,22 +46,24 @@ class UserRepository(private val apiService: ApiService) {
                     val responseBody = response.body()
                     Log.d("REfefee1", responseBody.toString())
                     if (responseBody != null) {
-//                        userPref.setUser(responseBody.loginResult!!)
+                        userPref.setEmail(email)
                         Toast.makeText(
                             activity,
                             responseBody.message.toString(),
                             Toast.LENGTH_SHORT
                         ).show()
                         val intent = Intent(activity, HomeActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        activity.finish()
                         activity.startActivity(intent)
                     } else {
                         val errorBody = response.errorBody()?.string()
                         Toast.makeText(activity, errorBody, Toast.LENGTH_SHORT).show()
                     }
                 } else {
+                    val errorBodyString = response.errorBody()?.string()
                     loadingDialog.dismiss()
                     if (response.code() == 422) {
-                        val errorBodyString = response.errorBody()?.string()
                         if (errorBodyString != null) {
                             try {
                                 val errorJson = JSONObject(errorBodyString)
@@ -76,6 +79,8 @@ class UserRepository(private val apiService: ApiService) {
                             }
                         }
                         Log.d("REfefee2", response.message())
+                    } else {
+                        Toast.makeText(activity, errorBodyString, Toast.LENGTH_SHORT).show()
                     }
 
                 }
@@ -94,10 +99,10 @@ class UserRepository(private val apiService: ApiService) {
     fun getUser(
         email: String,
         userPref: SharedPrefManager
-    ) : LiveData<Result<User>> {
-        val user = MediatorLiveData<Result<User>>()
+    ) : LiveData<Result<GetUserResponse>> {
+        val user = MediatorLiveData<Result<GetUserResponse>>()
 
-        Log.d("AFsDASD", email)
+
         user.postValue(Result.Loading)
         val client = apiService.getUser(email)
         client.enqueue(object : Callback<GetUserResponse> {
@@ -110,7 +115,7 @@ class UserRepository(private val apiService: ApiService) {
                     Log.d("REfefee1", responseBody.toString())
                     if (responseBody != null) {
                         userPref.setUser(responseBody.user)
-                        user.value = Result.Success(responseBody.user)
+                        user.value = Result.Success(responseBody)
                         Log.d("URED1231", responseBody.user.toString())
                     } else {
                         val errorBody = response.errorBody()?.string()
@@ -166,6 +171,38 @@ class UserRepository(private val apiService: ApiService) {
         return article;
     }
 
+    fun predictImage(
+        image: MultipartBody.Part
+    ) : LiveData<Result<UploadResponse>> {
+        val result = MediatorLiveData<Result<UploadResponse>>()
+        result.postValue(Result.Loading)
+        val client = apiService.predictImage(image)
+        client.enqueue(object : Callback<UploadResponse> {
+            override fun onResponse(
+                call: Call<UploadResponse>,
+                response: Response<UploadResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    Log.d("REfefe2e1", responseBody.toString())
+                    if (responseBody != null) {
+                        result.value = Result.Success(responseBody)
+                    } else {
+                        val errorBody = response.errorBody()?.string()
+                        Log.d("URE2D1231", errorBody.toString())
+                        result.postValue(Result.Error("Error ${response.code()}"))
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<UploadResponse>, t: Throwable) {
+                result.postValue(Result.Error(t.message.toString()))
+            }
+        })
+
+        return result
+    }
+
 
     fun loginUser(
         email: String,
@@ -183,7 +220,7 @@ class UserRepository(private val apiService: ApiService) {
                     if (responseBody != null) {
                         userPref.setEmail(email)
                         val intent = Intent(activity, HomeActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         activity.finish()
                         activity.startActivity(intent)
                     }

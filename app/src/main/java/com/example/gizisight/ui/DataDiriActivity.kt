@@ -1,5 +1,6 @@
 package com.example.gizisight.ui
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -20,10 +21,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import java.util.*
 
 class DataDiriActivity : AppCompatActivity() {
     private var _binding: ActivityDataDiriBinding? = null
     private val binding get() = _binding
+    private var tanggalLahir: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityDataDiriBinding.inflate(layoutInflater)
@@ -33,6 +36,8 @@ class DataDiriActivity : AppCompatActivity() {
         val viewModel: DataDiriViewModel by viewModels {
             factory
         }
+
+        val sharedPref = SharedPrefManager(this)
 
         val currentUser = GoogleSignIn.getLastSignedInAccount(this)
         if( currentUser != null ){
@@ -80,14 +85,27 @@ class DataDiriActivity : AppCompatActivity() {
         val photoUrl = intent.getStringExtra("photoUrl")
 
         binding?.apply {
+            tfUmur.setOnClickListener{
+                showDatePicker()
+            }
             btnSubmit.setOnClickListener{
                 loadingDialog.startLoadingDialog()
                 val gender = autoCompleteTextView.text.toString()
-                val age = tfUmur.editText?.text.toString()
                 val height = tfTinggi.editText?.text.toString()
                 val weight = tfBeratBadan.editText?.text.toString()
 
-                viewModel.registerUser(email!!, username!!, "123123", gender, age, height, weight, this@DataDiriActivity, loadingDialog )
+                val englishGender = when (gender.toLowerCase()) {
+                    "perempuan" -> "Female"
+                    else -> "Male"
+                }
+
+
+                if(!tanggalLahir.isNullOrEmpty()){
+                    viewModel.registerUser(email!!, username!!, "123123", englishGender, tanggalLahir!!, height, weight, this@DataDiriActivity, loadingDialog, sharedPref )
+
+                } else {
+                    Toast.makeText(this@DataDiriActivity, "Tanggal Lahir Kosong", Toast.LENGTH_SHORT).show()
+                }
 
             }
         }
@@ -101,5 +119,26 @@ class DataDiriActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(
+            this,
+            DatePickerDialog.OnDateSetListener { _, selectedYear, selectedMonth, selectedDay ->
+                // Set the selected date to the EditText
+                binding?.tfUmur?.setText("$selectedDay/${selectedMonth + 1}/$selectedYear")
+                tanggalLahir = "$selectedYear-${selectedMonth + 1}-$selectedDay"
+            },
+            year,
+            month,
+            day
+        )
+
+        datePickerDialog.show()
     }
 }

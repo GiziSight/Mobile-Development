@@ -71,6 +71,8 @@
                             android:layout_gravity="start"
                             android:fontFamily="@font/poppins_semibold"
                             android:text="Halo,"
+                            android:maxLines="1"
+                            android:ellipsize="end"
                             android:textColor="@color/black"
                             android:textSize="28sp" />
 
@@ -165,7 +167,7 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="13dp"
+                    android:layout_marginRight="6dp"
                     app:cardBackgroundColor="@color/white"
                     app:cardCornerRadius="12dp"
                     app:cardMaxElevation="12dp"
@@ -184,7 +186,7 @@
                             android:src="@drawable/kalori" />
 
                         <TextView
-                            android:id="@+id/tvKalori"
+                            android:id="@+id/tvKaloriValue"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins_medium"
@@ -193,12 +195,13 @@
                             android:textSize="14sp" />
 
                         <TextView
+                            android:id="@+id/tvKaloriName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins_medium"
                             android:text="Kalori"
                             android:textColor="#8C8F93"
-                            android:textSize="14sp" />
+                            android:textSize="12sp" />
 
 
                     </LinearLayout>
@@ -212,7 +215,7 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="13dp"
+                    android:layout_marginRight="6dp"
                     app:cardBackgroundColor="@color/white"
                     app:cardCornerRadius="12dp"
                     app:cardMaxElevation="12dp"
@@ -231,7 +234,7 @@
                             android:src="@drawable/serat" />
 
                         <TextView
-                            android:id="@+id/tvSerat"
+                            android:id="@+id/tvSeratValue"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins_medium"
@@ -240,12 +243,13 @@
                             android:textSize="14sp" />
 
                         <TextView
+                            android:id="@+id/tvSeratName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins_medium"
                             android:text="Serat"
                             android:textColor="#8C8F93"
-                            android:textSize="14sp" />
+                            android:textSize="12sp" />
 
 
                     </LinearLayout>
@@ -259,7 +263,7 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="13dp"
+                    android:layout_marginRight="6dp"
                     app:cardBackgroundColor="@color/white"
                     app:cardCornerRadius="12dp"
                     app:cardMaxElevation="12dp"
@@ -278,7 +282,7 @@
                             android:src="@drawable/protein" />
 
                         <TextView
-                            android:id="@+id/tvProtein"
+                            android:id="@+id/tvProteinValue"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins_medium"
@@ -287,12 +291,13 @@
                             android:textSize="14sp" />
 
                         <TextView
+                            android:id="@+id/tvProteinName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins_medium"
                             android:text="Protein"
                             android:textColor="#8C8F93"
-                            android:textSize="14sp" />
+                            android:textSize="12sp" />
 
 
                     </LinearLayout>
