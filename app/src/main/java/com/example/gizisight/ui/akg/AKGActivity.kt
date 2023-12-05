@@ -71,7 +71,7 @@ class AKGActivity : AppCompatActivity() {
                             val bb = result.data.personalData.userInfo[2].nilai
                             val tinggi = result.data.personalData.userInfo[3].nilai
                             binding?.apply {
-                                tvInfo.text = "Angka Kecukupan Gizi (AKG) Usia $range dengan berat badan $bb kg dan tinggi badan $tinggi"
+                                tvInfo.text = "Angka Kecukupan Gizi (AKG) Usia $range dengan berat badan $bb dan tinggi badan $tinggi"
                                 tvName.text = capitalizeFirstLetterEachWord(result.data.user.username)
                                 tvUmur.text = "${user.age}"
                                 tvTinggi.text = "${user.height} cm"

@@ -83,7 +83,7 @@ class ProfileFragment : Fragment() {
                                     binding.tvEmail.text = acct.email
                                     tvUmur.text = "${user.age}"
                                     tvHeight.text = user.height.toString() + " cm"
-                                    tvWeight.text = user.weight.toString() + " Kg"
+                                    tvWeight.text = user.weight.toString() + " kg"
                                     Glide.with(requireActivity()).load(personPhoto).circleCrop()
                                         .into(binding.imgProfile)
                                 } else {
@@ -91,7 +91,7 @@ class ProfileFragment : Fragment() {
                                     tvName.text = user.email
                                     tvUmur.text = "${user.age}"
                                     tvHeight.text = user.height.toString() + " cm"
-                                    tvWeight.text = user.weight.toString() + " Kg"
+                                    tvWeight.text = user.weight.toString() + " kg"
                                     when (user.gender) {
                                         "Laki-laki", "MALE", "Male" -> {
                                             Glide.with(requireActivity()).load(R.drawable.man2)
@@ -138,8 +138,8 @@ class ProfileFragment : Fragment() {
                             binding.apply {
                                 tvName.text = capitalizeFirstLetterEachWord(user.username)
                                 tvUmur.text = user.age.toString()
-                                tvHeight.text = user.height.toString() + " CM"
-                                tvWeight.text = user.weight.toString() + " Kg"
+                                tvHeight.text = user.height.toString() + " cm"
+                                tvWeight.text = user.weight.toString() + " kg"
                                 tvEmail.text = user.email
                                 when (user.gender) {
                                     "Laki-laki", "Male", "MALE" -> {

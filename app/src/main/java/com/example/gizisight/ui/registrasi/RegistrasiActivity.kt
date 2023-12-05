@@ -114,8 +114,7 @@ class RegistrasiActivity : AppCompatActivity() {
         binding?.autoCompleteTextView?.setAdapter(arrayAdapter)
 
         binding?.btnMasuk?.setOnClickListener {
-            val intent = Intent(this@RegistrasiActivity, LoginActivity::class.java)
-            startActivity(intent)
+            finish()
         }
 
     }
